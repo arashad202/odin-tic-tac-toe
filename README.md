@@ -11,4 +11,4 @@ A simple two-player Tic Tac Toe game built with HTML, JavaScript, and Tailwind C
 
 ## Play Now
 
-<a href="https://your-username.github.io/tic-tac-toe/" target="_blank">Click here to view live version</a>
+<a href="https://arashad202.github.io/odin-tic-tac-toe/" target="_blank">Click here to view live version</a>
