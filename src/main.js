@@ -73,3 +73,56 @@ function cell() {
 ** anybody has won the game
 */
 
+function GameController(playerOneName = "Player One", playerTwoName = "Player Two") {
+  const board = gameBoard();
+  const players = [
+    {
+      name: playerOneName,
+      token: 'X'
+    },
+    {
+      name: playerTwoName,
+      token: 'Y'
+    }
+  ];
+
+  let activePlayer = players[0];
+
+
+  const switchPlayerTurn = () => {
+    activePlayer = activePlayer === players[0] ? players[1] : players[0];
+  }
+
+  const getActivePlayer = () => activePlayer;
+
+  const printNewRound = () => {
+    board.printBoard();
+    console.log(`${getActivePlayer().name}'s turn.`);
+  }
+
+  const playRound = (row, column) => {
+    // drop a token for the current player
+    console.log(`Dropping ${getActivePlayer().name}'s token into row ${row} column ${column}...`)
+    
+    board.putMark(row, column, getActivePlayer().token);
+  }
+
+
+  // switch player trun
+  switchPlayerTurn();
+  printNewRound();
+
+  // Initial play game message
+  printNewRound();
+  
+  // For the console version, we will only use playRound, but we will need
+  // getActivePlayer for the UI version, so I'm revealing it now
+  return {
+    playRound,
+    getActivePlayer
+  }
+}
+
+const game = GameController();
+
+
