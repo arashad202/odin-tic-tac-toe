@@ -8,7 +8,11 @@
     <script type="module" src="/src/main.js" defer></script>
     <title>Vite App</title>
   </head>
-  <body>
+  <body class="w-screen">
     <h1 class="font-bold text-3xl my-5 mx-5 text-center">Tic Tac Toe</h1>
+    <div class="container w-100vw m-auto grid grid-rows-[1fr_4fr] grid-cols-[1fr_1fr_1fr]">
+     <h1 class="turn row-start-1 col-start-2"></h1>
+     <div class="board grid h-[500px] w-[500px] grid-cols-[repeat(3,1fr)] grid-rows-[repeat(3,1fr)] border gap-0.5 bg-black p-0.5 border-solid border-[black] row-start-2 col-start-2"></div>
+   </div>
   </body>
 </html>

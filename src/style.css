@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+
+.cell {
+  @apply flex justify-center items-center text-center text-[2rem] border cursor-pointer border-solid border-[grey];
+  background: white;
+}
