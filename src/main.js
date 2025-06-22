@@ -51,3 +51,25 @@ function gameBoard() {
 ** Y: Player 2's token
 */
 
+function cell() {
+  let value = 0;
+
+  // Accept a player's token to change the value of the cell
+  const addMark = (player) => {
+    value = player;
+  };
+
+  const getValue = () => value;
+
+  return {
+    addMark,
+    getValue
+  }
+}
+
+/* 
+** The GameController will be responsible for controlling the 
+** flow and state of the game's turns, as well as whether
+** anybody has won the game
+*/
+
