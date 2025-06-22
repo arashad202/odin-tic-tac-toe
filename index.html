@@ -4,15 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/public/tic-tac-toe-game-svgrepo-com.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="/src/style.css" rel="stylesheet">
+    <link href="/src/style.css" rel="stylesheet" />
     <script type="module" src="/src/main.js" defer></script>
-    <title>Vite App</title>
+    <title>Tic Tac Toe</title>
   </head>
-  <body class="w-screen">
-    <h1 class="font-bold text-3xl my-5 mx-5 text-center">Tic Tac Toe</h1>
-    <div class="container w-100vw m-auto grid grid-rows-[1fr_4fr] grid-cols-[1fr_1fr_1fr]">
-     <h1 class="turn row-start-1 col-start-2"></h1>
-     <div class="board grid h-[500px] w-[500px] grid-cols-[repeat(3,1fr)] grid-rows-[repeat(3,1fr)] border gap-0.5 bg-black p-0.5 border-solid border-[black] row-start-2 col-start-2"></div>
-   </div>
+  <body class="w-screen flex flex-col items-center">
+    <p class="font-bold text-3xl my-5 text-center">Tic Tac Toe</p>
+
+    <!-- Player Setup -->
+    <div class="mb-4 space-x-4">
+      <input id="player1" placeholder="Player One" class="border p-2 rounded" />
+      <input id="player2" placeholder="Player Two" class="border p-2 rounded" />
+      <button id="startBtn" class="bg-blue-500 text-white p-2 rounded">Start Game</button>
+    </div>
+
+    <!-- Game Container -->
+    <div class="container m-auto grid grid-rows-[1fr_4fr] grid-cols-[1fr_1fr_1fr]">
+      <h1 class="turn text-xl text-center row-start-1 col-start-2"></h1>
+      <div class="board grid h-[500px] w-[500px] grid-cols-[repeat(3,1fr)] grid-rows-[repeat(3,1fr)] border gap-0.5 bg-black p-0.5 border-solid border-[black] row-start-2 col-start-2"></div>
+    </div>
   </body>
 </html>

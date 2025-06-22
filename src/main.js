@@ -3,11 +3,6 @@ function gameBoard() {
   const columns = 3;
   const board = [];
 
-
-  // Create a 2d array that will represent the state of the game board
-  // For this 2d array, row 0 will represent the top row and
-  // column 0 will represent the left-most column.
-  // This nested-loop technique is a simple and common way to create a 2d array.
   for (let i = 0; i < rows; i++) {
     board[i] = [];
     for (let j = 0; j < columns; j++) {
@@ -15,114 +10,191 @@ function gameBoard() {
     }
   }
 
-  // This will be the method of getting the entire board that our
-  // UI will eventually need to render it.
   const getBoard = () => board;
 
-  // In order to mark a cell, we need to find what the available cells of the
-  // selected column is, *then* change that cell's value to the player mark
   const putMark = (row, column, player) => {
-    // check if row,column is empty
-    // put mark if empty if not then return
-    if (board[row][column].getValue() === 0) {
+    if (board[row][column].getValue() === "") {
       board[row][column].addMark(player);
-    } else {
-      return;
     }
-  }
+  };
 
-  // This method will be used to print our board to the console.
-  // It is helpful to see what the board looks like after each turn as we play,
-  // but we won't need it after we build our UI
-  const printBoard = () => {
-    const boardWithValues = board.map((row) => row.map((cell) => cell.getValue()));
-    console.log(boardWithValues);
-  }
-
-  // Here, we provide an interface for the rest of our
-  // application to interact with the board
-  return {getBoard, putMark, printBoard};
+  return { getBoard, putMark };
 }
 
-/*
-** A Cell represents one "square" on the board and can have one of
-** 0: no token is in the square,
-** X: Player One's token,
-** Y: Player 2's token
-*/
-
 function cell() {
-  let value = 0;
+  let value = "";
 
-  // Accept a player's token to change the value of the cell
   const addMark = (player) => {
     value = player;
   };
 
   const getValue = () => value;
 
-  return {
-    addMark,
-    getValue
-  }
+  return { addMark, getValue };
 }
 
-/* 
-** The GameController will be responsible for controlling the 
-** flow and state of the game's turns, as well as whether
-** anybody has won the game
-*/
-
-function GameController(playerOneName = "Player One", playerTwoName = "Player Two") {
+function GameController(playerOneName, playerTwoName) {
   const board = gameBoard();
   const players = [
-    {
-      name: playerOneName,
-      token: 'X'
-    },
-    {
-      name: playerTwoName,
-      token: 'Y'
-    }
+    { name: playerOneName, token: "X" },
+    { name: playerTwoName, token: "O" },
   ];
 
   let activePlayer = players[0];
-
+  let gameOver = false;
 
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
-  }
+  };
 
   const getActivePlayer = () => activePlayer;
+  const getBoard = () => board.getBoard();
 
-  const printNewRound = () => {
-    board.printBoard();
-    console.log(`${getActivePlayer().name}'s turn.`);
-  }
+  const getPlayerByToken = (token) =>
+    players.find((p) => p.token === token);
+
+  const checkWinner = () => {
+    const boardState = board.getBoard().map((row) =>
+      row.map((cell) => cell.getValue())
+    );
+
+    // Rows
+    for (let row of boardState) {
+      if (row[0] !== "" && row.every((cell) => cell === row[0])) {
+        return row[0];
+      }
+    }
+
+    // Columns
+    for (let col = 0; col < 3; col++) {
+      if (
+        boardState[0][col] !== "" &&
+        boardState[0][col] === boardState[1][col] &&
+        boardState[1][col] === boardState[2][col]
+      ) {
+        return boardState[0][col];
+      }
+    }
+
+    // Diagonals
+    if (
+      boardState[0][0] !== "" &&
+      boardState[0][0] === boardState[1][1] &&
+      boardState[1][1] === boardState[2][2]
+    ) {
+      return boardState[0][0];
+    }
+
+    if (
+      boardState[0][2] !== "" &&
+      boardState[0][2] === boardState[1][1] &&
+      boardState[1][1] === boardState[2][0]
+    ) {
+      return boardState[0][2];
+    }
+
+    return null;
+  };
+
+  const checkDraw = () => {
+    const boardState = board.getBoard().map((row) =>
+      row.map((cell) => cell.getValue())
+    );
+    return boardState.flat().every((cell) => cell !== "");
+  };
 
   const playRound = (row, column) => {
-    // drop a token for the current player
-    console.log(`Dropping ${getActivePlayer().name}'s token into row ${row} column ${column}...`)
-    
-    board.putMark(row, column, getActivePlayer().token);
-  }
+    if (gameOver) return;
 
+    row = Number(row);
+    column = Number(column);
 
-  // switch player trun
-  switchPlayerTurn();
-  printNewRound();
+    if (board.getBoard()[row][column].getValue() !== "") return;
 
-  // Initial play game message
-  printNewRound();
-  
-  // For the console version, we will only use playRound, but we will need
-  // getActivePlayer for the UI version, so I'm revealing it now
+    board.putMark(row, column, activePlayer.token);
+
+    const winnerToken = checkWinner();
+    if (winnerToken) {
+      gameOver = true;
+    } else if (checkDraw()) {
+      gameOver = true;
+    } else {
+      switchPlayerTurn();
+    }
+  };
+
   return {
     playRound,
-    getActivePlayer
-  }
+    getActivePlayer,
+    getBoard,
+    isGameOver: () => gameOver,
+    getWinnerToken: checkWinner,
+    getPlayerByToken,
+  };
 }
 
-const game = GameController();
+function screenController() {
+  let game = null;
 
+  const playerTurnDiv = document.querySelector(".turn");
+  const boardDiv = document.querySelector(".board");
+  const startBtn = document.getElementById("startBtn");
 
+  const updateScreen = () => {
+    boardDiv.textContent = "";
+    if (!game) return;
+
+    const board = game.getBoard();
+    const winnerToken = game.getWinnerToken();
+
+    if (game.isGameOver()) {
+      if (winnerToken) {
+        const winner = game.getPlayerByToken(winnerToken);
+        playerTurnDiv.textContent = `${winner.name} wins! 🎉`;
+      } else {
+        playerTurnDiv.textContent = "It's a draw!";
+      }
+    } else {
+      playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn...`;
+    }
+
+    board.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        const cellBtn = document.createElement("button");
+        cellBtn.classList.add("cell", "text-4xl", "bg-white");
+        cellBtn.textContent = cell.getValue();
+        cellBtn.dataset.row = rowIndex;
+        cellBtn.dataset.column = colIndex;
+
+        if (cell.getValue() !== "" || game.isGameOver()) {
+          cellBtn.disabled = true;
+        }
+
+        boardDiv.appendChild(cellBtn);
+      });
+    });
+  };
+
+  const clickHandlerBoard = (e) => {
+    const row = e.target.dataset.row;
+    const column = e.target.dataset.column;
+    if (!row || !column || !game) return;
+
+    game.playRound(row, column);
+    updateScreen();
+  };
+
+  const startGame = () => {
+    const player1 = document.getElementById("player1").value || "Player 1";
+    const player2 = document.getElementById("player2").value || "Player 2";
+    game = GameController(player1, player2);
+    updateScreen();
+  };
+
+  boardDiv.addEventListener("click", clickHandlerBoard);
+  startBtn.addEventListener("click", startGame);
+
+  updateScreen(); // Initial screen
+}
+
+screenController();
